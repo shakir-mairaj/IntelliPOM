@@ -1,0 +1,35 @@
+{
+  "name": "intellipom",
+  "version": "1.0.0",
+  "description": "Generates Page Object Model classes (Playwright, Cypress, Selenium) from any HTML, with locator-stability scoring baked into every selector.",
+  "main": "src/cli.js",
+  "directories": {
+    "example": "examples",
+    "test": "tests"
+  },
+  "scripts": {
+    "start": "node src/server/server.js",
+    "test": "node --test tests/*.test.js",
+    "generate": "node src/cli.js"
+  },
+  "bin": {
+    "intellipom": "src/cli.js"
+  },
+  "keywords": [
+    "qa-automation",
+    "page-object-model",
+    "playwright",
+    "cypress",
+    "selenium",
+    "test-automation",
+    "codegen"
+  ],
+  "author": "Shakir",
+  "license": "MIT",
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "express": "^5.2.1",
+    "multer": "^2.2.0",
+    "playwright": "^1.62.1"
+  }
+}

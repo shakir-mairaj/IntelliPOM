@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IntelliPOM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">▣</span>
+    <div class="brand-text">
+      <h1>IntelliPOM</h1>
+      <p>HTML in, POM out. — for Playwright, Cypress &amp; Selenium.</p>
+    </div>
+  </div>
+</header>
+
+<main class="workbench">
+
+  <section class="panel input-panel" aria-label="Input">
+    <div class="panel-head">
+      <h2>01 — Input</h2>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Input mode">
+      <button class="tab is-active" role="tab" data-mode="paste" aria-selected="true">Paste HTML</button>
+      <button class="tab" role="tab" data-mode="upload" aria-selected="false">Upload file</button>
+      <button class="tab" role="tab" data-mode="live" aria-selected="false">Live URL</button>
+    </div>
+
+    <div class="tab-panel" data-panel="paste">
+      <div class="field-row">
+        <span class="field-label">HTML</span>
+        <button type="button" class="btn-clear" id="clearHtmlBtn">Clear</button>
+      </div>
+      <textarea id="htmlInput" class="html-textarea" spellcheck="false"
+        placeholder="&lt;button data-testid=&quot;submit&quot;&gt;Log in&lt;/button&gt;"></textarea>
+    </div>
+
+    <div class="tab-panel is-hidden" data-panel="upload">
+      <label class="dropzone" for="fileInput">
+        <span class="dropzone-icon" aria-hidden="true">↑</span>
+        <span class="dropzone-text">Click to choose an .html file</span>
+        <span class="dropzone-filename" id="fileName"></span>
+      </label>
+      <input type="file" id="fileInput" accept=".html,.htm" hidden />
+      <button type="button" class="btn-clear btn-clear-block" id="clearUploadBtn">Clear file</button>
+    </div>
+
+    <div class="tab-panel is-hidden" data-panel="live">
+      <div class="field-row">
+        <span class="field-label">Page URL</span>
+        <button type="button" class="btn-clear" id="clearUrlBtn">Clear</button>
+      </div>
+      <input type="url" id="urlInput" class="text-input" placeholder="https://your-app.com/login" />
+      <p class="hint">Launches a real headless browser server-side and waits for the page to render — works on React/Vue/Angular apps, not just static HTML.</p>
+    </div>
+
+    <div class="input-footer">
+      <div class="field">
+        <label class="field-label" for="classNameInput">Class name</label>
+        <input type="text" id="classNameInput" class="text-input" value="GeneratedPage" />
+      </div>
+      <button id="generateBtn" class="btn-primary">Generate page object</button>
+    </div>
+
+    <p id="errorMsg" class="error-msg is-hidden" role="alert"></p>
+  </section>
+
+  <section class="panel output-panel" aria-label="Output">
+    <div class="panel-head">
+      <h2>02 — Output</h2>
+      <span id="elementCount" class="element-count"></span>
+    </div>
+
+    <div id="emptyState" class="empty-state">
+      <p>Generated locators will show up here, each with a confidence score explaining why it was chosen.</p>
+    </div>
+
+    <div id="results" class="is-hidden">
+
+      <div class="locator-list" id="locatorList" aria-label="Ranked locators"></div>
+
+      <div class="tabs framework-tabs" role="tablist" aria-label="Framework">
+        <button class="tab is-active" role="tab" data-framework="playwright" aria-selected="true">Playwright</button>
+        <button class="tab" role="tab" data-framework="cypress" aria-selected="false">Cypress</button>
+        <button class="tab" role="tab" data-framework="selenium" aria-selected="false">Selenium (Python)</button>
+      </div>
+
+      <div class="code-block">
+        <button id="copyBtn" class="btn-copy" type="button">Copy</button>
+        <pre><code id="codeOutput"></code></pre>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p>Locator priority: data-testid &gt; id &gt; aria-label &gt; name &gt; role/text &gt; class &gt; structural. Auto-generated-looking values are detected and scored down.</p>
+</footer>
+
+<script src="/js/app.js"></script>
+</body>
+</html>
