@@ -1,4 +1,22 @@
 (() => {
+  // Theme toggle — runs first, before anything else, so the correct theme
+  // applies immediately on load rather than flashing dark-then-light.
+  const themeToggle = document.getElementById("themeToggle");
+  const rootEl = document.documentElement;
+
+  function applyTheme(theme) {
+    rootEl.setAttribute("data-theme", theme);
+    themeToggle.textContent = theme === "light" ? "🌙" : "☀️";
+  }
+
+  applyTheme(localStorage.getItem("intellipom-theme") || "dark");
+
+  themeToggle.addEventListener("click", () => {
+    const next = rootEl.getAttribute("data-theme") === "light" ? "dark" : "light";
+    localStorage.setItem("intellipom-theme", next);
+    applyTheme(next);
+  });
+
   const state = {
     mode: "paste",
     framework: "playwright",
