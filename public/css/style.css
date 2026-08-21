@@ -21,6 +21,16 @@
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
+[data-theme="light"] {
+  --bg: #f7f8fa;
+  --panel: #ffffff;
+  --panel-raised: #f0f2f5;
+  --border: #dde2e8;
+  --text: #1a1f26;
+  --text-dim: #5a6472;
+  /* keep --score-high/--score-mid/--score-low as-is — those are semantic, not theme colors */
+}
+
 * { box-sizing: border-box; }
 
 html, body {

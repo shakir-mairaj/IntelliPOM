@@ -27,11 +27,28 @@
     copyBtn: document.getElementById("copyBtn"),
   };
 
+  const themeToggle = document.getElementById("themeToggle");
+  const root = document.documentElement;
+
   function band(score) {
     if (score >= 80) return "high";
     if (score >= 50) return "mid";
     return "low";
   }
+
+    function applyTheme(theme) {
+    root.setAttribute("data-theme", theme);
+    themeToggle.textContent = theme === "light" ? "🌙" : "☀️";
+  }
+
+  const saved = localStorage.getItem("theme") || "dark";
+  applyTheme(saved);
+
+  themeToggle.addEventListener("click", () => {
+    const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+    localStorage.setItem("theme", next);
+    applyTheme(next);
+  });
 
   function meterSegments(score) {
     const filled = Math.max(1, Math.round(score / 20)); // 5 segments, 20pts each
