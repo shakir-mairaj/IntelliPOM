@@ -22,33 +22,20 @@
     emptyState: document.getElementById("emptyState"),
     results: document.getElementById("results"),
     elementCount: document.getElementById("elementCount"),
+    attentionBanner: document.getElementById("attentionBanner"),
     locatorList: document.getElementById("locatorList"),
+    verifyUrlInput: document.getElementById("verifyUrlInput"),
+    verifyBtn: document.getElementById("verifyBtn"),
+    verifyStatus: document.getElementById("verifyStatus"),
     codeOutput: document.getElementById("codeOutput"),
     copyBtn: document.getElementById("copyBtn"),
   };
-
-  const themeToggle = document.getElementById("themeToggle");
-  const root = document.documentElement;
 
   function band(score) {
     if (score >= 80) return "high";
     if (score >= 50) return "mid";
     return "low";
   }
-
-    function applyTheme(theme) {
-    root.setAttribute("data-theme", theme);
-    themeToggle.textContent = theme === "light" ? "🌙" : "☀️";
-  }
-
-  const saved = localStorage.getItem("theme") || "dark";
-  applyTheme(saved);
-
-  themeToggle.addEventListener("click", () => {
-    const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
-    localStorage.setItem("theme", next);
-    applyTheme(next);
-  });
 
   function meterSegments(score) {
     const filled = Math.max(1, Math.round(score / 20)); // 5 segments, 20pts each
@@ -170,6 +157,8 @@
     el.results.classList.remove("is-hidden");
     el.elementCount.textContent = `${data.elementCount} element${data.elementCount === 1 ? "" : "s"}`;
 
+    renderAttentionBanner(data);
+
     el.locatorList.innerHTML = data.elements
       .map(
         (e) => `
@@ -179,12 +168,36 @@
             <div class="locator-name">${e.name}</div>
             <div class="locator-reason">${e.reason}</div>
           </div>
+          <span class="verify-badge" id="verify-badge-${e.name}"></span>
           <div class="score-badge band-${band(e.score)}">${e.score}</div>
         </div>`
       )
       .join("");
 
+    el.verifyStatus.classList.add("is-hidden");
+    el.verifyUrlInput.value = "";
+
     renderCode();
+  }
+
+  // Feature 4: "elements needing attention" summary — flags fragile locators
+  // (score below 50, i.e. band "low" — class/structural fallbacks or values
+  // that failed the uniqueness check) so the fix is visible before you even
+  // look at generated code.
+  function renderAttentionBanner(data) {
+    const fragile = data.elements.filter((e) => band(e.score) === "low");
+    if (fragile.length === 0) {
+      el.attentionBanner.classList.remove("is-hidden");
+      el.attentionBanner.classList.add("is-clear");
+      el.attentionBanner.textContent = `All ${data.elementCount} locators have a reasonably stable selector.`;
+      return;
+    }
+    el.attentionBanner.classList.remove("is-clear");
+    el.attentionBanner.classList.remove("is-hidden");
+    el.attentionBanner.textContent =
+      `${fragile.length} of ${data.elementCount} element${data.elementCount === 1 ? "" : "s"} ` +
+      `${fragile.length === 1 ? "has" : "have"} only a fragile locator (${fragile.map((e) => e.name).join(", ")}) ` +
+      `— consider adding a data-testid.`;
   }
 
   function renderCode() {
@@ -201,6 +214,64 @@
       el.copyBtn.textContent = "Copy";
       el.copyBtn.classList.remove("is-copied");
     }, 1500);
+  });
+
+  // Feature 1: "Verify live" — re-checks the generated selectors against the
+  // CURRENT rendered DOM of a URL, so a paste/upload-mode result (which may
+  // be a stale HTML snapshot) can be double-checked against the real page.
+  el.verifyBtn.addEventListener("click", async () => {
+    if (!state.lastResult) return;
+    const url = el.verifyUrlInput.value.trim();
+    if (!url) {
+      el.verifyStatus.textContent = "Enter a URL to verify against.";
+      el.verifyStatus.classList.remove("is-hidden");
+      return;
+    }
+
+    const selectors = {};
+    for (const e of state.lastResult.elements) {
+      selectors[e.name] = e.cssSelector || null;
+    }
+
+    el.verifyBtn.disabled = true;
+    el.verifyBtn.textContent = "Verifying…";
+    el.verifyStatus.classList.remove("is-hidden");
+    el.verifyStatus.textContent = "Launching a headless browser to check the live page…";
+
+    try {
+      const res = await fetch("/api/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url, selectors }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Verification failed.");
+
+      let okCount = 0;
+      let mismatchCount = 0;
+      for (const [name, result] of Object.entries(data.results)) {
+        const badge = document.getElementById(`verify-badge-${name}`);
+        if (!badge) continue;
+        if (result.matchCount === 1) {
+          badge.textContent = "✓ live-verified";
+          badge.className = "verify-badge is-ok";
+          okCount++;
+        } else if (result.matchCount === null) {
+          badge.textContent = "manual check";
+          badge.className = "verify-badge is-unknown";
+        } else {
+          badge.textContent = `⚠ ${result.matchCount} matches live`;
+          badge.className = "verify-badge is-mismatch";
+          mismatchCount++;
+        }
+      }
+      el.verifyStatus.textContent = `Verified against the live page: ${okCount} confirmed unique, ${mismatchCount} mismatched.`;
+    } catch (err) {
+      el.verifyStatus.textContent = err.message;
+    } finally {
+      el.verifyBtn.disabled = false;
+      el.verifyBtn.textContent = "Verify live";
+    }
   });
 
   el.generateBtn.addEventListener("click", generate);

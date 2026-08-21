@@ -12,12 +12,11 @@
 <body>
 
 <header class="topbar">
-  <button id="themeToggle">🌙</button>
   <div class="brand">
     <span class="brand-mark" aria-hidden="true">▣</span>
     <div class="brand-text">
       <h1>IntelliPOM</h1>
-      <p>HTML in, POM out. — for Playwright, Cypress &amp; Selenium.</p>
+      <p>HTML in, ranked locators out — for Playwright, Cypress &amp; Selenium.</p>
     </div>
   </div>
 </header>
@@ -86,7 +85,15 @@
 
     <div id="results" class="is-hidden">
 
+      <div id="attentionBanner" class="attention-banner is-hidden"></div>
+
       <div class="locator-list" id="locatorList" aria-label="Ranked locators"></div>
+
+      <div class="verify-row">
+        <input type="url" id="verifyUrlInput" class="text-input" placeholder="Optional: verify these locators against a live URL" />
+        <button id="verifyBtn" class="btn-secondary" type="button">Verify live</button>
+      </div>
+      <p id="verifyStatus" class="hint is-hidden"></p>
 
       <div class="tabs framework-tabs" role="tablist" aria-label="Framework">
         <button class="tab is-active" role="tab" data-framework="playwright" aria-selected="true">Playwright</button>

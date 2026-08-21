@@ -21,16 +21,6 @@
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
-[data-theme="light"] {
-  --bg: #f7f8fa;
-  --panel: #ffffff;
-  --panel-raised: #f0f2f5;
-  --border: #dde2e8;
-  --text: #1a1f26;
-  --text-dim: #5a6472;
-  /* keep --score-high/--score-mid/--score-low as-is — those are semantic, not theme colors */
-}
-
 * { box-sizing: border-box; }
 
 html, body {
@@ -329,7 +319,7 @@ html, body {
 
 .locator-row {
   display: grid;
-  grid-template-columns: 96px minmax(0, 1fr) auto;
+  grid-template-columns: 96px minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 14px;
   background: var(--panel);
@@ -383,6 +373,66 @@ html, body {
 .score-badge.band-high { color: var(--score-high); background: var(--score-high-soft); }
 .score-badge.band-mid { color: var(--score-mid); background: var(--score-mid-soft); }
 .score-badge.band-low { color: var(--score-low); background: var(--score-low-soft); }
+
+/* Feature 4: attention banner — summarizes how many locators are fragile */
+
+.attention-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--score-mid-soft);
+  border: 1px solid var(--score-mid);
+  color: var(--score-mid);
+  font-size: 13px;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+
+.attention-banner.is-clear {
+  background: var(--score-high-soft);
+  border-color: var(--score-high);
+  color: var(--score-high);
+}
+
+/* Feature 1: verify-live row and per-locator verify badges */
+
+.verify-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.verify-row .text-input { flex: 1; }
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 13px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+.btn-secondary:disabled { opacity: 0.5; cursor: default; }
+
+.verify-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 3px 7px;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+
+.verify-badge.is-ok { color: var(--score-high); background: var(--score-high-soft); }
+.verify-badge.is-mismatch { color: var(--score-low); background: var(--score-low-soft); }
+.verify-badge.is-unknown { color: var(--text-faint); background: var(--panel-raised); }
 
 /* Code output */
 
